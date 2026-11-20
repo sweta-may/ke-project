@@ -78,16 +78,29 @@ ke-project/
   ```
   *(Note: The system contains built-in zero-dependency fallbacks so it runs immediately out of the box).*
 
-### 2. Run the End-to-End Pipeline Demo
+### 2. Run the Interactive Web Dashboard (FastAPI - Zero Extra Dependencies)
+The project comes with a built-in interactive web dashboard powered by FastAPI, Chart.js, and Tailwind CSS:
+```bash
+python -m uvicorn src.app.server:app --port 8000
+```
+Then open your browser at **`http://127.0.0.1:8000`** to:
+- Select and trigger real-time failure scenarios (*Normal, Bearing Degradation, Coolant Loss, Motor Overload*).
+- View live streaming sensor telemetry charts with threshold indicators.
+- Inspect the static Knowledge Graph asset hierarchy and component lifetimes.
+- Watch the expert rule inference engine fire live alerts with grounded root-cause diagnoses and prescribed maintenance actions.
+
+### 3. (Optional) Run with Streamlit
+If you have Streamlit installed (`pip install streamlit`):
+```bash
+streamlit run src/app/streamlit_app.py
+```
+
+### 4. Run the Terminal Demo Pipeline
 ```bash
 python src/demo_runner.py
 ```
-This runs three simulated scenarios:
-1. **Healthy Baseline:** Continuous normal operations.
-2. **Bearing Degradation:** Vibrational and thermal buildup matching aged equipment heuristics.
-3. **Coolant Failure:** Rapid pressure loss triggering high-temperature alarms.
 
-### 3. Run Automated Tests
+### 5. Run Automated Tests
 ```bash
 python tests/test_scenarios.py
 ```
@@ -105,5 +118,5 @@ python tests/test_scenarios.py
   - Implemented `src/pipeline/semantic_lifter.py` mapping raw time-series data to ontology entities.
 - [x] **Phase 4: Reasoning & Rule Execution Engine**
   - Implemented `src/rules/rule_evaluator.py` evaluating static + dynamic conjunctions.
-- [ ] **Phase 5: Interactive Dashboard & Web Interface**
-  - Build a live visual Streamlit / React dashboard showing the machine topology, real-time gauges, and active rule firing visualizations.
+- [x] **Phase 5: Interactive Dashboard & Web Interface**
+  - Implemented real-time interactive UI in `src/app/server.py` and `src/app/streamlit_app.py`.

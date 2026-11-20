@@ -1,0 +1,6 @@
+# Knowledge Engineering & Semantic Web
+rdflib>=7.0.0
+pydantic>=2.0.0
+
+# Optional visualization & streaming (Phase 5)
+streamlit>=1.30.0

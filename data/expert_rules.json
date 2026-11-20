@@ -1,0 +1,82 @@
+{
+  "version": "1.0",
+  "domain": "Smart Manufacturing & Predictive Maintenance",
+  "rules": [
+    {
+      "id": "RULE_001_BEARING_DEGRADATION",
+      "name": "High Vibration & Thermal Degradation on Aged Bearing",
+      "description": "When vibration and temperature exceed warning thresholds and operating hours exceed 80% of rated life, infer severe bearing fatigue.",
+      "conditions": {
+        "target_component": "Spindle_01",
+        "dynamic_conditions": [
+          { "sensor_id": "SEN-VIB-01", "metric": "vibration_rms", "operator": ">=", "state_check": "WARNING" },
+          { "sensor_id": "SEN-TMP-01", "metric": "temperature", "operator": ">=", "state_check": "WARNING" }
+        ],
+        "static_conditions": [
+          { "property": "operating_ratio", "operator": ">=", "value": 0.80 }
+        ]
+      },
+      "conclusion": {
+        "severity": "CRITICAL",
+        "failure_mode": "Failure_BearingWear",
+        "explanation": "Spindle exhibits concurrent elevated vibration and thermal buildup, coupled with remaining useful life < 20% (operating hours: 4250/5000 hrs).",
+        "action": "Action_ScheduleBearingInspection"
+      }
+    },
+    {
+      "id": "RULE_002_COOLANT_STARVATION",
+      "name": "Coolant Pressure Loss Inducing Spindle Overheating",
+      "description": "When coolant pressure drops below warning threshold while spindle temperature is rising, infer coolant delivery failure.",
+      "conditions": {
+        "target_component": "Spindle_01",
+        "dynamic_conditions": [
+          { "sensor_id": "SEN-TMP-01", "metric": "temperature", "operator": ">=", "state_check": "WARNING" },
+          { "sensor_id": "SEN-PRS-01", "metric": "coolant_pressure", "operator": "<=", "state_check": "WARNING" }
+        ],
+        "static_conditions": []
+      },
+      "conclusion": {
+        "severity": "CRITICAL",
+        "failure_mode": "Failure_CoolantStarvation",
+        "explanation": "Spindle temperature elevated due to insufficient coolant pressure in circulation line.",
+        "action": "Action_InspectCoolantLines"
+      }
+    },
+    {
+      "id": "RULE_003_THERMAL_RUNAWAY",
+      "name": "Critical Thermal Limit Breach",
+      "description": "Temperature exceeding absolute critical threshold (90°C) triggers immediate safety shutdown.",
+      "conditions": {
+        "target_component": "Spindle_01",
+        "dynamic_conditions": [
+          { "sensor_id": "SEN-TMP-01", "metric": "temperature", "operator": ">=", "state_check": "CRITICAL" }
+        ],
+        "static_conditions": []
+      },
+      "conclusion": {
+        "severity": "EMERGENCY",
+        "failure_mode": "Failure_ThermalRunaway",
+        "explanation": "Spindle temperature has exceeded safe operational ceiling (90°C). Seizure imminent.",
+        "action": "Action_EmergencyShutdown"
+      }
+    },
+    {
+      "id": "RULE_004_MOTOR_OVERLOAD",
+      "name": "Motor Overcurrent Draw Under Load",
+      "description": "Current draw above warning threshold indicates excessive tool load or feed rate.",
+      "conditions": {
+        "target_component": "DriveMotor_01",
+        "dynamic_conditions": [
+          { "sensor_id": "SEN-CURR-01", "metric": "motor_current", "operator": ">=", "state_check": "WARNING" }
+        ],
+        "static_conditions": []
+      },
+      "conclusion": {
+        "severity": "WARNING",
+        "failure_mode": "Failure_MotorOverload",
+        "explanation": "Main servo drive is drawing excessive current (above 26A rated continuous).",
+        "action": "Action_ReduceFeedRate"
+      }
+    }
+  ]
+}

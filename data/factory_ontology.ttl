@@ -1,0 +1,268 @@
+@prefix : <http://smartfactory.org/ontology#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix sosa: <http://www.w3.org/ns/sosa/> .
+
+<http://smartfactory.org/ontology> rdf:type owl:Ontology ;
+    rdfs:label "Smart Factory Knowledge Engineering Ontology" ;
+    rdfs:comment "Ontology bridging static industrial asset hierarchies and dynamic sensor telemetry." ;
+    owl:versionInfo "1.0" .
+
+#################################################################
+#    Classes (T-Box)
+#################################################################
+
+:Plant rdf:type owl:Class ;
+    rdfs:label "Industrial Plant" .
+
+:ProductionLine rdf:type owl:Class ;
+    rdfs:label "Production Line" .
+
+:Machine rdf:type owl:Class ;
+    rdfs:label "Industrial Machine" .
+
+:CNCMachine rdf:type owl:Class ;
+    rdfs:subClassOf :Machine ;
+    rdfs:label "CNC Milling / Lathe Machine" .
+
+:IndustrialRobot rdf:type owl:Class ;
+    rdfs:subClassOf :Machine ;
+    rdfs:label "Articulated Industrial Robot" .
+
+:Component rdf:type owl:Class ;
+    rdfs:label "Machine Component" .
+
+:Spindle rdf:type owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "High-Speed Spindle" .
+
+:Motor rdf:type owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "Drive Motor" .
+
+:Bearing rdf:type owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "Rotary Bearing" .
+
+:CoolantSystem rdf:type owl:Class ;
+    rdfs:subClassOf :Component ;
+    rdfs:label "Coolant Circulation Subsystem" .
+
+:Sensor rdf:type owl:Class ;
+    rdfs:label "Physical IoT Sensor" .
+
+:VibrationSensor rdf:type owl:Class ;
+    rdfs:subClassOf :Sensor ;
+    rdfs:label "Vibration Transducer / Accelerometer" .
+
+:TemperatureSensor rdf:type owl:Class ;
+    rdfs:subClassOf :Sensor ;
+    rdfs:label "Thermal Sensor / Thermocouple" .
+
+:PressureSensor rdf:type owl:Class ;
+    rdfs:subClassOf :Sensor ;
+    rdfs:label "Fluid Pressure Sensor" .
+
+:CurrentSensor rdf:type owl:Class ;
+    rdfs:subClassOf :Sensor ;
+    rdfs:label "Electrical Current Sensor" .
+
+:ObservationState rdf:type owl:Class ;
+    rdfs:label "Dynamic Observation State" .
+
+:NormalState rdf:type owl:Class ;
+    rdfs:subClassOf :ObservationState ;
+    rdfs:label "Normal Operation" .
+
+:WarningState rdf:type owl:Class ;
+    rdfs:subClassOf :ObservationState ;
+    rdfs:label "Degraded / Warning State" .
+
+:CriticalState rdf:type owl:Class ;
+    rdfs:subClassOf :ObservationState ;
+    rdfs:label "Critical State" .
+
+:FailureMode rdf:type owl:Class ;
+    rdfs:label "Equipment Failure Mode" .
+
+:MaintenanceAction rdf:type owl:Class ;
+    rdfs:label "Prescribed Remedial Action" .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+:hasProductionLine rdf:type owl:ObjectProperty ;
+    rdfs:domain :Plant ;
+    rdfs:range :ProductionLine .
+
+:hasMachine rdf:type owl:ObjectProperty ;
+    rdfs:domain :ProductionLine ;
+    rdfs:range :Machine .
+
+:hasComponent rdf:type owl:ObjectProperty ;
+    rdfs:domain :Machine ;
+    rdfs:range :Component .
+
+:monitoredBy rdf:type owl:ObjectProperty ;
+    rdfs:domain :Component ;
+    rdfs:range :Sensor .
+
+:hasDynamicState rdf:type owl:ObjectProperty ;
+    rdfs:domain :Component ;
+    rdfs:range :ObservationState .
+
+:indicatesFailure rdf:type owl:ObjectProperty ;
+    rdfs:domain :ObservationState ;
+    rdfs:range :FailureMode .
+
+:prescribesAction rdf:type owl:ObjectProperty ;
+    rdfs:domain :FailureMode ;
+    rdfs:range :MaintenanceAction .
+
+#################################################################
+#    Data Properties
+#################################################################
+
+:machineId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Machine ;
+    rdfs:range xsd:string .
+
+:componentId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Component ;
+    rdfs:range xsd:string .
+
+:sensorId rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Sensor ;
+    rdfs:range xsd:string .
+
+:operatingHours rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Component ;
+    rdfs:range xsd:float .
+
+:ratedOperatingHours rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Component ;
+    rdfs:range xsd:float .
+
+:warningThreshold rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Sensor ;
+    rdfs:range xsd:float .
+
+:criticalThreshold rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Sensor ;
+    rdfs:range xsd:float .
+
+:unitOfMeasure rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Sensor ;
+    rdfs:range xsd:string .
+
+:metricName rdf:type owl:DatatypeProperty ;
+    rdfs:domain :Sensor ;
+    rdfs:range xsd:string .
+
+#################################################################
+#    Static Instances / Asset Topology (A-Box)
+#################################################################
+
+:Plant_Detroit_01 rdf:type :Plant ;
+    rdfs:label "Automotive Machining Plant 01" ;
+    :hasProductionLine :Line_Machining_A .
+
+:Line_Machining_A rdf:type :ProductionLine ;
+    rdfs:label "Machining Line A - Heavy Duty" ;
+    :hasMachine :CNC_Milling_01 .
+
+:CNC_Milling_01 rdf:type :CNCMachine ;
+    :machineId "CNC-MILL-01" ;
+    rdfs:label "5-Axis High Precision CNC Milling Center" ;
+    :hasComponent :Spindle_01 , :DriveMotor_01 , :CoolantPump_01 .
+
+# Spindle Component & Attached Sensors
+:Spindle_01 rdf:type :Spindle ;
+    :componentId "CMP-SPINDLE-01" ;
+    rdfs:label "Electro-Spindle Unit" ;
+    :operatingHours "4250.0"^^xsd:float ;
+    :ratedOperatingHours "5000.0"^^xsd:float ;
+    :monitoredBy :Sensor_VIB_Spindle , :Sensor_TEMP_Spindle .
+
+:Sensor_VIB_Spindle rdf:type :VibrationSensor ;
+    :sensorId "SEN-VIB-01" ;
+    :metricName "vibration_rms" ;
+    :unitOfMeasure "mm/s" ;
+    :warningThreshold "4.5"^^xsd:float ;
+    :criticalThreshold "7.1"^^xsd:float ;
+    rdfs:label "Spindle Drive-End Vibration Sensor" .
+
+:Sensor_TEMP_Spindle rdf:type :TemperatureSensor ;
+    :sensorId "SEN-TMP-01" ;
+    :metricName "temperature" ;
+    :unitOfMeasure "degC" ;
+    :warningThreshold "75.0"^^xsd:float ;
+    :criticalThreshold "90.0"^^xsd:float ;
+    rdfs:label "Spindle Thermal Probe" .
+
+# Drive Motor Component & Sensor
+:DriveMotor_01 rdf:type :Motor ;
+    :componentId "CMP-MOTOR-01" ;
+    rdfs:label "Main AC Servo Motor" ;
+    :operatingHours "6100.0"^^xsd:float ;
+    :ratedOperatingHours "8000.0"^^xsd:float ;
+    :monitoredBy :Sensor_CURR_Motor .
+
+:Sensor_CURR_Motor rdf:type :CurrentSensor ;
+    :sensorId "SEN-CURR-01" ;
+    :metricName "motor_current" ;
+    :unitOfMeasure "A" ;
+    :warningThreshold "26.0"^^xsd:float ;
+    :criticalThreshold "35.0"^^xsd:float ;
+    rdfs:label "Motor Phase Current Sensor" .
+
+# Coolant Subsystem & Pressure Sensor
+:CoolantPump_01 rdf:type :CoolantSystem ;
+    :componentId "CMP-COOLANT-01" ;
+    rdfs:label "High-Pressure Flood Coolant Pump" ;
+    :operatingHours "2100.0"^^xsd:float ;
+    :ratedOperatingHours "10000.0"^^xsd:float ;
+    :monitoredBy :Sensor_PRESS_Coolant .
+
+:Sensor_PRESS_Coolant rdf:type :PressureSensor ;
+    :sensorId "SEN-PRS-01" ;
+    :metricName "coolant_pressure" ;
+    :unitOfMeasure "bar" ;
+    :warningThreshold "2.2"^^xsd:float ; # Warning if falls below
+    :criticalThreshold "1.2"^^xsd:float ; # Critical if falls below
+    rdfs:label "Coolant Delivery Line Pressure Sensor" .
+
+#################################################################
+#    Failure Modes & Action Definitions
+#################################################################
+
+:Failure_BearingWear rdf:type :FailureMode ;
+    rdfs:label "Bearing Fatigue / Inner-Raceway Flaking" ;
+    :prescribesAction :Action_ScheduleBearingInspection .
+
+:Failure_ThermalRunaway rdf:type :FailureMode ;
+    rdfs:label "Thermal Runaway & Spindle Seizure Risk" ;
+    :prescribesAction :Action_EmergencyShutdown .
+
+:Failure_CoolantStarvation rdf:type :FailureMode ;
+    rdfs:label "Tool & Spindle Overheating via Coolant Starvation" ;
+    :prescribesAction :Action_InspectCoolantLines .
+
+:Failure_MotorOverload rdf:type :FailureMode ;
+    rdfs:label "Drive Motor Mechanical Stall / Overload" ;
+    :prescribesAction :Action_ReduceFeedRate .
+
+:Action_EmergencyShutdown rdf:type :MaintenanceAction ;
+    rdfs:label "Trigger Controlled E-Stop and Lockout/Tagout" .
+
+:Action_ScheduleBearingInspection rdf:type :MaintenanceAction ;
+    rdfs:label "Schedule Predictive Bearing Replacement within 24 Hours" .
+
+:Action_InspectCoolantLines rdf:type :MaintenanceAction ;
+    rdfs:label "Check Coolant Reservoir Level and Filter Blockage" .
+
+:Action_ReduceFeedRate rdf:type :MaintenanceAction ;
+    rdfs:label "Throttle CNC Feed Rate to 50% and Inspect Tool Wear" .
